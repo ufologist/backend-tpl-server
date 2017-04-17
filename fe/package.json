@@ -9,7 +9,7 @@
   },
   "author": "Sun",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "backend-tpl-server": "^0.1.0",
     "mockjs": "^1.0.1-beta3"
   }
