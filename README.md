@@ -15,3 +15,6 @@
 
 * 安装 [Node.js](http://nodejs.org/) `6.x`
 * 将 [fe](https://github.com/ufologist/backend-tpl-server/tree/master/fe) 目录中的文件复制到你的 Java Web 项目根目录的 fe 目录中
+* 在 fe 目录下 `npm install`
+  * 推荐全局安装 `npm install nodemon -g`, 用于开发时自动 reload
+* `npm start` 启动服务器
