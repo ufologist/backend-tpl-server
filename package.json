@@ -4,9 +4,22 @@
   "description": "后端模版页面服务器",
   "main": "src/backend-tpl-server.js",
   "scripts": {
-    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ufologist/backend-tpl-server.git"
+  },
+  "keywords": [
+    "dev",
+    "mock",
+    "server",
+    "velocity"
+  ],
+  "bugs": {
+    "url": "https://github.com/ufologist/backend-tpl-server/issues"
+  },
+  "homepage": "https://github.com/ufologist/backend-tpl-server",
   "author": "Sun",
   "license": "MIT",
   "dependencies": {

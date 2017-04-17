@@ -9,20 +9,9 @@
 [changelog-image]: https://img.shields.io/badge/CHANGE-LOG-blue.svg?style=flat-square
 [changelog-url]: https://github.com/ufologist/backend-tpl-server/blob/master/CHANGELOG.md
 
-后端模版页面服务器, 使用的后端模版引擎是: [Velocity](http://velocity.apache.org/), 适合前后端一起来协作编写后端模版页面
+后端模版页面服务器, 使用的后端模版引擎是: [Velocity](http://velocity.apache.org/), 适合前后端一起来协作编写页面
 
 ## 使用说明
 
-```javascript
-var BackendTplServer = require('backend-tpl-server');
-
-// 指定后端 Java Web 项目的路径
-var backendTplServer = new BackendTplServer('../src/main/webapp');
-backendTplServer.start();
-
-// 指定要查看哪个页面
-backendTplServer.url('a/b/c/page.html', {
-    id: '@id',
-    name: '@cname'
-});
-```
+* 安装 [Node.js](http://nodejs.org/) `6.x`
+* 将 [fe](https://github.com/ufologist/backend-tpl-server/tree/master/fe) 目录中的文件复制到你的 Java Web 项目根目录的 fe 目录中

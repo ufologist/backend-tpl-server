@@ -1,0 +1,16 @@
+{
+  "name": "website-xxx-fe",
+  "version": "0.1.0",
+  "description": "Java Web 项目前端开发",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sun",
+  "license": "ISC",
+  "dependencies": {
+    "backend-tpl-server": "^0.1.0",
+    "mockjs": "^1.0.1-beta3"
+  }
+}
