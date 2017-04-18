@@ -22,3 +22,62 @@ backendTplServer.app.get('/abc', function(request, response) {
 
     response.render('abc.html', mockData);
 });
+
+// JavaBean 模式
+// 在模版页面中通过 $!{a.getTitle()} 这样的方式拿数据
+backendTplServer.app.get('/javabean', function(request, response) {
+    // 公共的数据模型可以抽取到出来, 作为一个文件 require 进来, 防止多处重复定义数据模型的规则
+    var data = Mock.mock({
+        'a|10-20': [{
+            getTitle: function() {
+                // Mock.js 会处理方法, 实际得到的是返回值, 因此这里需要返回一个方法
+                return function() {
+                    return Mock.mock('@ctitle');
+                };
+            }
+        }]
+    });
+
+    // 单独修改其中的某个数据
+    data.a[0].getUrls = function() {
+        return [
+            'http://dummyimage.com/112x74,',
+            'http://dummyimage.com/112x74,',
+            'http://dummyimage.com/112x74,',
+            'http://dummyimage.com/112x74,'
+        ]
+    };
+
+    response.render('home.html', data);
+});
+
+// HTTP 接口返回 JSON 数据
+backendTplServer.app.post('/json/getPageData', function(request, response) {
+    var data = Mock.mock({
+        'data|10-20': [{
+            title: '@ctitle'
+        }]
+    });
+
+    response.json(data);
+});
+
+// 路由路径和请求方法一起定义了请求的端点，它可以是字符串、字符串模式或者正则表达式
+// http://www.expressjs.com.cn/guide/routing.html
+// http://forbeslindesay.github.io/express-route-tester/
+// https://www.npmjs.com/package/path-to-regexp
+//
+// backendTplServer.app.get(/json\/\d+/, function(request, response) {
+backendTplServer.app.get('/json/\\d+', function(request, response) {
+    var data = Mock.mock({
+        'a': {
+            getTitle: function() {
+                return function() {
+                    return Mock.mock('@ctitle');
+                };
+            }
+        }
+    });
+
+    response.render('detail.html', data);
+});
