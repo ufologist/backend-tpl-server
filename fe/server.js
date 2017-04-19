@@ -28,6 +28,7 @@ backendTplServer.app.get('/abc', function(request, response) {
         name: '@cname'
     });
 
+    // 如果对象中有方法的定义, 最好不要放在 Mock.mock 中, 因为他会将方法定义变成直接的属性值(方法的返回值)
     data.__helper = __helper;
 
     response.render('abc.html', data);
