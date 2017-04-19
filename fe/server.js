@@ -78,7 +78,9 @@ backendTplServer.app.post('/json/getPageData', function(request, response) {
 // http://forbeslindesay.github.io/express-route-tester/
 // https://www.npmjs.com/package/path-to-regexp
 //
-// backendTplServer.app.get(/json\/\d+/, function(request, response) {
+// When you use a regular expression for the route definition,
+// capture groups are provided in the array using req.params[n], where n is the nth capture group.
+// backendTplServer.app.get(/\/json\/(\d+)/, function(request, response) {
 backendTplServer.app.get('/json/\\d+', function(request, response) {
     var data = Mock.mock({
         'a': {
