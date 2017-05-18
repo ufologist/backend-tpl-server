@@ -1,4 +1,5 @@
 var http = require('http');
+var path = require('path');
 
 var express = require('express');
 var vm = require('express-velocity');
@@ -121,9 +122,9 @@ BackendTplServer.prototype.serveStatic = function() {
     //       website-pc\src\main\webapp\resources 放的是静态资源
     //
     // 开发环境是这样引用静态资源的
-    // 例如: '/ys/1.0.0' + '/css/ys-css.css'
+    // 例如: '/user/1.0.0' + '/user.css'
     // 正式环境是引用的 CDN 线上的静态资源
-    // 例如: 'https://static.daojia.com/changsha/pc/ys/1.0.0' + '/css/ys-css.css'
+    // 例如: 'https://yourcdn.com/changsha/pc/user/1.0.0' + '/user.css'
     this.app.use(express.static(this.options.web.static));
 };
 /**
@@ -133,7 +134,7 @@ BackendTplServer.prototype.start = function() {
     this.server.listen(this.options.port, function() {
         console.log('---------------BackendTplServer--------------------------');
         console.log('project info:');
-        console.log('  webroot: ' + this.webroot);
+        console.log('  webroot: ' + path.resolve(this.webroot));
         console.log('  options: ' + JSON.stringify(this.options, null, 4));
         console.log('---------------routes------------------------------------');
         console.log('routes: ' + JSON.stringify(getRoutes(this.app), null, 4));
