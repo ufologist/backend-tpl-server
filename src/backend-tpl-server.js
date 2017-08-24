@@ -1,5 +1,6 @@
 var http = require('http');
 var path = require('path');
+var fs = require('fs');
 
 var express = require('express');
 var vm = require('express-velocity');
@@ -65,7 +66,8 @@ if (!String.prototype.equals) {
  *         static: webroot + '/resources', // 静态资源所在的目录
  *         views: webroot + '/views'       // 页面模版所在的目录
  *     },
- *     port: 8000 // 服务启动所在的端口
+ *     port: 8000, // 服务启动所在的端口
+ *     tplFileExt: 'html' // 模版页面文件名的后缀
  * }
  */
 function BackendTplServer(webroot, options) {
@@ -78,7 +80,8 @@ function BackendTplServer(webroot, options) {
             static: webroot + '/resources',
             views: webroot + '/views'
         },
-        port: 8000
+        port: 8000,
+        tplFileExt: 'html' // 模版页面文件名的后缀
     }, options);
 
     this.app = app;
@@ -88,6 +91,7 @@ function BackendTplServer(webroot, options) {
     this.initLiveReload();
     this.serveStatic();
     this.registerGetRoutesApi();
+    this.registerRenderTplRoute();
 }
 /**
  * 初始化视图的配置
@@ -95,9 +99,12 @@ function BackendTplServer(webroot, options) {
  * 即配置页面模版在哪里, 并使用什么模版引擎
  */
 BackendTplServer.prototype.initViewSetting = function() {
-    this.app.engine('.html', vm({
+    this.app.engine(this.options.tplFileExt, vm({
         root: this.webroot // duplicated with views setting but required for velocity template
     }));
+    // 设置默认的模版引擎, 否则当 render 方法中指定没有后缀的模版页面时, 就会报错
+    // No default engine was specified and no extension was provided
+    this.app.set('view engine', this.options.tplFileExt);
     this.app.set('views', this.options.web.views);
 };
 /**
@@ -186,5 +193,48 @@ BackendTplServer.prototype.registerGetRoutesApi = function() {
         });
     });
 };
+
+/**
+ * 专门用于渲染模版页面的路由
+ * 
+ * 例如: http://localhost:8000/_views/a/b/c.html 即渲染 a/b/c.html 这个模版页面,
+ * 与 url 方法的逻辑类似, 但是不需要我们通过写代码来定义路由指定模版页面
+ */
+BackendTplServer.prototype.registerRenderTplRoute = function() {
+    this.app.get('/_views/*', function(request, response) {
+        // http://www.expressjs.com.cn/4x/api.html#req.params
+        // This rule is applied to unnamed wild card matches with string routes such as /file/*
+        var tplFile = request.params[0];
+        var tplFilePath = path.resolve(request.app.get('views'), tplFile);
+
+        // 当 render 的模版文件不存在时, 必须使用 callback 回调来处理这个错误,
+        // 否则就会造成进程挂掉.
+        // 因此先判断文件是否存在, 再去渲染.
+        fs.stat(tplFilePath, function(error, stats) {
+            if (!error) {
+                if (stats.isFile()) {
+                    console.log('RenderTpl', tplFilePath);
+                    response.render(tplFile, {}, function(e, html) {
+                        if(e) {
+                            response.send(e);
+                        } else {
+                            response.send(html);
+                        }
+                    });
+                } else if (stats.isDirectory()) {
+                    response.status(400).send('这是一个文件夹: ' + tplFilePath);
+                } else {
+                    response.status(400).send(stats);
+                }
+            } else {
+                if (error.code == 'ENOENT') {
+                    response.status(404).send('没有找到这个文件: ' + tplFilePath);
+                } else {
+                    response.status(500).send(error);
+                }
+            }
+        });
+    });
+}
 
 module.exports = BackendTplServer;

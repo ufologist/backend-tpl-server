@@ -26,7 +26,7 @@
 
 * 安装 [Node.js](http://nodejs.org/) `6.x`
 * 将 [fe](https://github.com/ufologist/backend-tpl-server/tree/master/fe) 目录中的文件复制到你的 Java Web 项目根目录的 fe 目录中
-* 在 fe 目录下 `npm install`
+* 在 fe 目录下 `npm install` 安装依赖
   * 推荐全局安装 `npm install nodemon -g`, 用于开发时自动 reload
 * `npm start` 启动服务器
 
@@ -37,6 +37,9 @@
   * [shepherdwind/velocity.js](https://github.com/shepherdwind/velocity.js)
   * [yashiro1899/velocity.java](https://github.com/yashiro1899/velocity.java)
   * [fex-team/jello](https://github.com/fex-team/jello "针对服务端为 Java Velocity 的前端工程解决方案")
+  * [jdf2e/jdf](https://github.com/jdf2e/jdf/blob/master/doc/core_vm.md "让前端来写后端的vm模板，并且前端不需要搭建各种繁杂的后端环境，前后端以 .vm 为沟通桥梁，另外模板的数据源可以在项目开始前前后端约定之后生成JSON文件，从而使两个角色并行开发。")
 * Velocity 文档
   * [VTL Reference](http://velocity.apache.org/engine/devel/vtl-reference.html "concise syntax for Velocity Template Language (VTL)")
   * [User's Guide](http://velocity.apache.org/engine/devel/user-guide.html "explains how to write Velocity templates")
+
+    > The following rule of thumb may be useful to better understand how Velocity works: References begin with $ and are used to get something. Directives begin with # and are used to do something.
