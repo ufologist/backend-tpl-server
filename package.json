@@ -1,6 +1,6 @@
 {
   "name": "backend-tpl-server",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "后端模版页面服务器",
   "main": "src/backend-tpl-server.js",
   "scripts": {
@@ -26,6 +26,7 @@
     "express": "^4.15.2",
     "express-velocity": "^1.0.0",
     "mockjs": "^1.0.1-beta3",
-    "puer": "^1.1.1"
+    "puer": "^1.1.1",
+    "strip-json-comments": "^2.0.1"
   }
 }

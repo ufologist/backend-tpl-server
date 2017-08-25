@@ -1,0 +1,7 @@
+// 对应 views/news/index.html 的 Mock 数据
+// * 可以使用注释, 方便对字段做一些说明
+// * 可以使用 mockjs 来定义随机的 Mock 数据, 相关配置项请参考 mockjs 示例
+//   http://mockjs.com/examples.html
+{
+    "a": 1 // 这是一个字段说明
+}

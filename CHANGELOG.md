@@ -1,5 +1,19 @@
 # CHANGELOG
 
+* v0.4.0 2017-8-25
+
+  实现渲染模版页面自动加载关联的 Mock 数据的功能, 以后基本上就不用自己写页面的路由了
+
+  URL 与模版页面及 Mock 数据的对应规则
+  * `http://localhost:8000/_views/a/b/c.html` [访问的 URL]
+  * `views/a/b/c.html` [对应的模版页面的路径]
+  * `fe/mock/views/a/b/c.json` 或者 `fe/mock/views/a/b/c.js` [对应的 Mock 数据的路径]
+
+  关于两种定义 Mock 数据的方式: `.json` 还是 `.js`
+  * 使用 `.json` 是最简单便捷的方式
+  * 为什么需要 `.js` 方式: 方便抽取出共用的数据在各个 Mock 数据中使用
+  * 当同时存在 `.json` 和 `.js` 的 Mock 数据时, 会优先使用 `.js` 产生的 Mock 数据
+
 * v0.3.1 2017-8-25
 
   由于 `weinre/lib/utils.js` 中定义的 `Error.prepareStackTrace` 有问题, 调用这个方法(例如 render 方法出错时)会造成进程挂掉, 因此删除掉这方法避免这个问题

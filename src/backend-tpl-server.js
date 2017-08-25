@@ -26,6 +26,8 @@ delete Error.prepareStackTrace;
 
 var Mock = require('mockjs');
 
+var getViewMockData = require('./get-view-mock-data.js');
+
 /**
  * 获取所有的路由信息
  * 
@@ -186,20 +188,20 @@ BackendTplServer.prototype.start = function() {
  *     response.render('a/b/c/d.html', {a: 1});
  * });
  * 
- * @param {string} tplFile 模版文件的路径, 以 options.web.views 所配置的位置为起点
- *                         例如: tplFile 为 a/b/c.html
- *                         那么最终对应的模版文件为 options.web.views + '/' + tplFile
+ * @param {string} tplFilePath 模版文件的路径, 以 options.web.views 所配置的位置为起点
+ *                             例如: tplFilePath 为 a/b/c.html
+ *                             那么最终对应的模版文件为 options.web.views + '/' + tplFilePath
  * @param {object} model 模版所需的数据, 会使用 Mock.js 来产生 mock 数据
  * @param {string} method 对应的 HTTP verbs, 默认为 get
  */
-BackendTplServer.prototype.url = function(tplFile, model, method) {
+BackendTplServer.prototype.url = function(tplFilePath, model, method) {
     method = method ? method.toLowerCase() : 'get';
 
-    var route = '/' + tplFile;
+    var route = '/' + tplFilePath;
 
     this.app[method](route, function(request, response) {
         var mockData = Mock.mock(model);
-        response.render(tplFile, mockData);
+        response.render(tplFilePath, mockData);
     });
 };
 /**
@@ -227,8 +229,8 @@ BackendTplServer.prototype.registerRenderTplRoute = function() {
     this.app.get('/_views/*', function(request, response) {
         // http://www.expressjs.com.cn/4x/api.html#req.params
         // This rule is applied to unnamed wild card matches with string routes such as /file/*
-        var tplFile = request.params[0];
-        var tplFilePath = path.resolve(request.app.get('views'), tplFile);
+        var tplFilePath = request.params[0];
+        var absTplFilePath = path.resolve(request.app.get('views'), tplFilePath);
 
         // 原来由于 weinre 中定义了 Error.prepareStackTrace 方法,
         // 只要 render 方法有错误(模版文件不存在或者有其他错误时),
@@ -237,31 +239,32 @@ BackendTplServer.prototype.registerRenderTplRoute = function() {
         // 现在 delete 了 Error.prepareStackTrace 方法后,
         // render 方法出错不会造成进程挂掉, 会在页面中打印出错误调用链, 但提示不是很友好,
         // 为了提示更加友好, 先判断文件是否存在, 再去渲染, 根据文件状态给与不同的错误提示
-        fs.stat(tplFilePath, function(error, stats) {
+        fs.stat(absTplFilePath, function(error, stats) {
             if (!error) {
                 if (stats.isFile()) {
-                    response.render(tplFile, {}, function(e, html) {
+                    response.render(tplFilePath, getViewMockData(tplFilePath), function(e, html) {
                         if(e) {
                             response.send(e);
                         } else {
                             response.send(html);
-                            console.log(new Date().toLocaleString(), 'RenderTpl', tplFilePath);
+                            console.log(new Date().toLocaleString(), 'RenderTpl', absTplFilePath);
+                            console.log('---------------------------------------------------------');
                         }
                     });
                 } else if (stats.isDirectory()) {
-                    response.status(400).send('这是一个文件夹: ' + tplFilePath);
+                    response.status(400).send('这是一个文件夹: ' + absTplFilePath);
                 } else {
                     response.status(400).send(stats);
                 }
             } else {
                 if (error.code == 'ENOENT') {
-                    response.status(404).send('没有找到这个文件: ' + tplFilePath);
+                    response.status(404).send('没有找到这个文件: ' + absTplFilePath);
                 } else {
                     response.status(500).send(error);
                 }
             }
         });
     });
-}
+};
 
 module.exports = BackendTplServer;
