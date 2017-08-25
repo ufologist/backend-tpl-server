@@ -4,7 +4,26 @@ var fs = require('fs');
 
 var express = require('express');
 var vm = require('express-velocity');
+
 var puer = require('puer');
+// 由于 livereload 功能使用了 puer, 而 puer 又使用了 weinre,
+// weinre/lib/utils.js 中定义了 Error.prepareStackTrace 方法去自定义出错时调用链的内容
+// https://github.com/v8/v8/wiki/Stack-Trace-API#customizing-stack-traces
+// 其中取出 func.displayName 时没有先判断 func 是否存在, 当 func 不存在时, 调用这个方法会造成整个进程挂掉.
+//
+// finalhandler\index.js:178
+//     msg = err.stack
+//              ^
+// TypeError: Cannot read property 'displayName' of undefined
+//
+// 如果希望这个方法正常运作, 需要将如下代码
+// funcName = func.displayName || func.name || callSite.getFunctionName();
+// 修改为
+// funcName = func ? func.displayName || func.name : callSite.getFunctionName();
+//
+// 不过一般我们不需要自定义出错时调用链的内容, 因此这里我们删除掉这个方法即可以避免上述问题
+delete Error.prepareStackTrace;
+
 var Mock = require('mockjs');
 
 /**
@@ -99,6 +118,10 @@ function BackendTplServer(webroot, options) {
  * 即配置页面模版在哪里, 并使用什么模版引擎
  */
 BackendTplServer.prototype.initViewSetting = function() {
+    // 注册文件名后缀对应的模版引擎处理器
+    // By default, Express will require() the engine based on the file extension
+    // For example, if you try to render a "foo.pug" file, Express invokes the following internally
+    // app.engine('pug', require('pug').__express);
     this.app.engine(this.options.tplFileExt, vm({
         root: this.webroot // duplicated with views setting but required for velocity template
     }));
@@ -207,18 +230,22 @@ BackendTplServer.prototype.registerRenderTplRoute = function() {
         var tplFile = request.params[0];
         var tplFilePath = path.resolve(request.app.get('views'), tplFile);
 
-        // 当 render 的模版文件不存在时, 必须使用 callback 回调来处理这个错误,
-        // 否则就会造成进程挂掉.
-        // 因此先判断文件是否存在, 再去渲染.
+        // 原来由于 weinre 中定义了 Error.prepareStackTrace 方法,
+        // 只要 render 方法有错误(模版文件不存在或者有其他错误时),
+        // 如果不使用 callback 回调来处理这个错误, 就会造成进程挂掉.
+        //
+        // 现在 delete 了 Error.prepareStackTrace 方法后,
+        // render 方法出错不会造成进程挂掉, 会在页面中打印出错误调用链, 但提示不是很友好,
+        // 为了提示更加友好, 先判断文件是否存在, 再去渲染, 根据文件状态给与不同的错误提示
         fs.stat(tplFilePath, function(error, stats) {
             if (!error) {
                 if (stats.isFile()) {
-                    console.log('RenderTpl', tplFilePath);
                     response.render(tplFile, {}, function(e, html) {
                         if(e) {
                             response.send(e);
                         } else {
                             response.send(html);
+                            console.log(new Date().toLocaleString(), 'RenderTpl', tplFilePath);
                         }
                     });
                 } else if (stats.isDirectory()) {

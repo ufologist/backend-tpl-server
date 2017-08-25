@@ -1,5 +1,9 @@
 # CHANGELOG
 
+* v0.3.1 2017-8-25
+
+  由于 `weinre/lib/utils.js` 中定义的 `Error.prepareStackTrace` 有问题, 调用这个方法(例如 render 方法出错时)会造成进程挂掉, 因此删除掉这方法避免这个问题
+
 * v0.3.0 2017-8-24
 
   添加 `/_views/*` 路由专门用于渲染模版页面
