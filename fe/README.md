@@ -7,7 +7,10 @@ fe/
 |   |   └── news/
 |   |       |── index.json
 |   |       └── index.js
-|   └── http/
+|   └── http/    -- HTTP Mock 接口配置
+|       └── api/
+|           |── user.json
+|           └── news.js
 |
 |── route/       -- 路由
 |   |── news.js

@@ -1,5 +1,16 @@
 # CHANGELOG
 
+* v0.5.0 2017-8-26
+
+  实现自动加载 HTTP Mock 接口的功能
+
+  只需要将 Mock 配置文件放置在 `fe/mock/http` 文件夹下即可(支持多层级目录结构),
+  Mock 配置文件可以是 `.json` 或者 `.js` 文件, 具体的配置项与 [puer-mock 项目的 _mockserver.json](https://github.com/ufologist/puer-mock#config) 一样
+
+  注册了 `/_apidoc` 路由, 用于查看所有的 Mock 接口配置, 例如:
+  * `http://localhost:8000/_apidoc`       [查看所有 Mock 接口的配置]
+  * `http://localhost:8000/_apidoc?map=1` [查看所有 Mock 文件与其 Mock 接口配置的映射关系]
+
 * v0.4.0 2017-8-25
 
   实现渲染模版页面自动加载关联的 Mock 数据的功能, 以后基本上就不用自己写页面的路由了

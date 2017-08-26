@@ -1,0 +1,31 @@
+// HTTP Mock 接口的配置文件, 可以在这个 JSON 中使用注释, 方便对接口做一些说明, 相当于一份接口文档的描述文件
+// 配置文件放置的规则推荐与 HTTP 接口的 URL 保持一致, 这样便于分模块维护
+// 例如:
+// HTTP 接口的 URL 是 `http://localhost:8000/api/user`
+// 那么 Mock 配置文件就应该放置在 `fe/mock/http/api/user.json`
+// 当然了, 这只是推荐规则, 配置文件其实只要放置在 `fe/mock/http` 这个目录下就可以了,
+// 你可以根据需要来规划文件夹和配置文件的个数
+//
+// 必须包含如下信息, 其他字段均是可选字段,
+// 具体配置请参考配置文档 https://github.com/ufologist/puer-mock#config
+// {
+//     "api": {
+//         "GET /api/user": {
+//             "response": {}
+//         }
+//     }
+// }
+{
+    "$schema": "http://rawgit.com/ufologist/puer-mock/master/_mockserver-schema.json",
+
+    "api": {
+        "GET /api/user": {
+            "response": {
+                "status": 0,
+                "data": {
+                    "name": "@cname"
+                }
+            }
+        }
+    }
+}

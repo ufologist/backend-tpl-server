@@ -27,6 +27,7 @@ delete Error.prepareStackTrace;
 var Mock = require('mockjs');
 
 var getViewMockData = require('./get-view-mock-data.js');
+var mockHttpApi = require('./mock-http-api.js');
 
 /**
  * 获取所有的路由信息
@@ -113,6 +114,7 @@ function BackendTplServer(webroot, options) {
     this.serveStatic();
     this.registerGetRoutesApi();
     this.registerRenderTplRoute();
+    this.registerMockApiRoute();
 }
 /**
  * 初始化视图的配置
@@ -265,6 +267,17 @@ BackendTplServer.prototype.registerRenderTplRoute = function() {
             }
         });
     });
+};
+
+/**
+ * 注册所有 HTTP Mock 接口的路由
+ * 
+ * 只需要将 Mock 配置文件放置在 `fe/mock/http` 文件夹下即可,
+ * Mock 配置文件可以是 `.json` 或者 `.js` 文件, 具体配置项与
+ * [puer-mock 项目的 _mockserver.json](https://github.com/ufologist/puer-mock#config) 一样
+ */
+BackendTplServer.prototype.registerMockApiRoute = function() {
+    mockHttpApi(this.app);
 };
 
 module.exports = BackendTplServer;
