@@ -8,8 +8,10 @@ var fs = require('fs');
 // and comments aren’t allowed
 var stripJsonComments = require('strip-json-comments');
 var Mock = require('mockjs');
+var merge = require('merge');
 
 var mockViewsBase = './mock/views';
+var globalMockJsFile = '_global.js';
 
 /**
  * 获取模版页面对应的 Mock 数据
@@ -34,9 +36,11 @@ function getViewMockData(tplFilePath) {
 
     var absMockJsonFilePath = path.resolve(mockViewsBase, tplFilePathWithoutExtname + '.json');
     var absMockJsFilePath = path.resolve(mockViewsBase, tplFilePathWithoutExtname + '.js');
+    var absGlobalMockJsFilePath = path.resolve(mockViewsBase, globalMockJsFile);
 
     var hasMockJsonFile = fs.existsSync(absMockJsonFilePath);
     var hasMockJsFile = fs.existsSync(absMockJsFilePath);
+    var hasGlobalMockJsFile = fs.existsSync(absGlobalMockJsFilePath);
 
     var mockData = {};
     if (hasMockJsFile) { // 优先尝试从 JS 文件中获取 Mock 数据
@@ -46,8 +50,14 @@ function getViewMockData(tplFilePath) {
     }
     mockData = Mock.mock(mockData);
 
-    console.log(new Date().toLocaleString(), 'getViewMockData', JSON.stringify(mockData, null, 4));
+    // 全局数据
+    if (hasGlobalMockJsFile) {
+        var globalData = getMockDataFromJs(absGlobalMockJsFilePath);
+        merge(mockData, globalData);
+        console.log(new Date().toLocaleString(), 'globalViewMockData', globalData);
+    }
 
+    console.log(new Date().toLocaleString(), 'getViewMockData', JSON.stringify(mockData, null, 4));
     return mockData;
 }
 
