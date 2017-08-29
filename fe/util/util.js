@@ -1,5 +1,6 @@
 // 使用方法
 // var util = require(path.resolve(process.cwd(), 'util/util.js'));
+// var news = util.readJson('model/news.json');
 
 var fs = require('fs');
 var path = require('path');
