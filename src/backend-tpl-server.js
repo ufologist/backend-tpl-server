@@ -26,6 +26,8 @@ delete Error.prepareStackTrace;
 
 var Mock = require('mockjs');
 
+var pkg = require('../package.json');
+
 var getViewMockData = require('./get-view-mock-data.js');
 var mockHttpApi = require('./mock-http-api.js');
 
@@ -166,6 +168,9 @@ BackendTplServer.prototype.serveStatic = function() {
  */
 BackendTplServer.prototype.start = function() {
     this.server.listen(this.options.port, function() {
+        // 修改命令行的标题, 这样当同时启动了多个服务器时, 可以清楚的知道哪个是哪个
+        process.title = path.resolve(this.webroot) + ' ' + this.options.port + ' v' + pkg.version;
+
         console.log('---------------BackendTplServer--------------------------');
         console.log('project info:');
         console.log('  webroot: ' + path.resolve(this.webroot));
