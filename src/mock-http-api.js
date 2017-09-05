@@ -123,7 +123,7 @@ function registerMockApiRoute(app, routeConfig) {
     var router = new Router();
 
     // 参考 puer 的 addon 机制
-    for (path in routeConfig) {
+    for (var path in routeConfig) {
         if (!__hasProp.call(routeConfig, path)) continue;
 
         var callback = routeConfig[path];
