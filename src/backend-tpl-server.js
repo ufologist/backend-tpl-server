@@ -35,6 +35,7 @@ var mockHttpApi = require('./mock-http-api.js');
  * 获取所有的路由信息
  * 
  * http://stackoverflow.com/questions/14934452/how-to-get-all-registered-routes-in-express
+ * https://github.com/brennancheung/express-remove-route
  * 
  * XXX 对于 app.use('/birds', router) 这样路由注册方式还解析不了
  * 
@@ -44,12 +45,7 @@ var mockHttpApi = require('./mock-http-api.js');
 function getRoutes(app) {
     var routes = [];
 
-    var layerRoutes = [];
-    app._router.stack.forEach(function(layer) {
-        if (layer.route) {
-            layerRoutes.push(layer.route);
-        }
-    });
+    var layerRoutes = findLayerRoutes(app._router.stack);
     layerRoutes.forEach(function(route) {
         for (var method in route.methods) {
             if (route.methods.hasOwnProperty(method)) {
@@ -61,7 +57,29 @@ function getRoutes(app) {
         }
     });
 
+    routes.sort(function(a, b) {
+        if (a.path > b.path) {
+            return 1;
+        } else if (a.path < b.path) {
+            return -1;
+        } else {
+            return 0;
+        }
+    });
+
     return routes;
+}
+
+function findLayerRoutes(stack) {
+    var layerRoutes = [];
+    stack.forEach(function(layer) {
+        if (layer.route) {
+            layerRoutes.push(layer.route);
+        } else if (layer.name == 'router') {
+            layerRoutes = layerRoutes.concat(findLayerRoutes(layer.handle.stack));
+        }
+    });
+    return layerRoutes;
 }
 
 // polyfill javascript 中没有的方法, 不然会造成模版中使用的方法不生效

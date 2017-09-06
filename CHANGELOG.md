@@ -1,5 +1,9 @@
 # CHANGELOG
 
+* v0.7.0 2017-9-6
+
+  当 HTTP Mock 文件修改后, 自动刷新 HTTP Mock 路由, 不再需要 `nodemon` 了
+
 * v0.6.2 2017-9-5
 
   修复未声明 `path` 变量造成无意间覆盖了 `path` 模块的 bug

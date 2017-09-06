@@ -2,12 +2,16 @@ var path = require('path');
 
 var glob = require('glob');
 var merge = require('merge');
+var chokidar = require('chokidar');
 var rc = require('puer-mock/src/route-config.js');
 var Router = require('express').Router;
+
+var removeRoute = require('./remove-route.js');
 
 var __hasProp = {}.hasOwnProperty;
 
 var mockHttpBase = './mock/http';
+var mockConfigFileGlob = mockHttpBase + '/**/*.{js,json}';
 
 /**
  * 从一组文件中获取 Mock 配置
@@ -31,6 +35,8 @@ function getMockInfo(filenames) {
             if (ext == '.json') {
                 mockConfig = rc.getMockConfig(filename);
             } else if (ext == '.js') {
+                // https://nodejs.org/api/modules.html#modules_require_cache
+                delete require.cache[path.resolve(filename)];
                 mockConfig = require(filename);
             }
         } catch (error) {
@@ -85,7 +91,7 @@ function tryFindDuplicateHttpApi(mockConfigMap) {
  * @return {Array<string>} Mock 配置文件的路径
  */
 function getMockConfigFilenames() {
-    var filenames = glob.sync(mockHttpBase + '/**/*.{js,json}', {
+    var filenames = glob.sync(mockConfigFileGlob, {
         absolute: true,
         nodir: true
     });
@@ -143,14 +149,66 @@ function registerMockApiRoute(app, routeConfig) {
     app.use(router);
 }
 
+/**
+ * 删除已经存在的 Mock 路由
+ * 
+ * @param {object} app 
+ * @param {object} routeConfig 
+ */
+function removeMockRoute(app, routeConfig) {
+    if (!routeConfig) {
+        return;
+    }
+
+    // 参考 puer 的 addon 机制
+    for (var path in routeConfig) {
+        if (!__hasProp.call(routeConfig, path)) continue;
+
+        var tmp = path.split(/\s+/);
+        if (tmp.length > 1) {
+            path = tmp[1];
+        }
+
+        removeRoute(app, path);
+    }
+}
+
+// 保存路由配置, 用于 watch 文件改动后删除已经存在的 Mock 路由
+var routeConfig;
+
 function mockHttpApi(app) {
+    removeRoute(app, '/_apidoc');
+    removeMockRoute(app, routeConfig);
+
     var filenames = getMockConfigFilenames();
     var mockInfo = getMockInfo(filenames);
-    var routeConfig = rc.generateRouteConfig(mockInfo.mockConfig);
+    routeConfig = rc.generateRouteConfig(mockInfo.mockConfig);
 
     tryFindDuplicateHttpApi(mockInfo.mockConfigMap);
     registerGetMockApi(app, mockInfo);
     registerMockApiRoute(app, routeConfig);
 }
 
-module.exports = mockHttpApi;
+/**
+ * 当 Mock 文件修改后, 自动刷新 Mock 路由
+ */
+function watchMockConfigFile(app) {
+    chokidar.watch(mockConfigFileGlob, {
+        cwd: process.cwd()
+    }).on('add', function(filePath) {
+        console.log(new Date().toLocaleString(), 'mockHttpApi: [add]    ' + path.resolve(filePath));
+        mockHttpApi(app);
+    }).on('change', function(filePath) {
+        console.log(new Date().toLocaleString(), 'mockHttpApi: [change] ' + path.resolve(filePath));
+        mockHttpApi(app);
+    }).on('unlink', function(filePath) {
+        console.log(new Date().toLocaleString(), 'mockHttpApi: [remove] ' + path.resolve(filePath));
+        mockHttpApi(app);
+    });
+}
+
+module.exports = function(app) {
+    // 先启动一次, 这样 _routes 路由才能及时得到已经注册的路由
+    mockHttpApi(app);
+    watchMockConfigFile(app);
+};
