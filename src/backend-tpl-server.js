@@ -269,7 +269,10 @@ BackendTplServer.prototype.registerRenderTplRoute = function() {
                 if (stats.isFile()) {
                     response.render(tplFilePath, getViewMockData(tplFilePath), function(e, html) {
                         if(e) {
-                            response.send(e);
+                            console.error('渲染模版页面出错', e);
+                            var message = e.stack.replace(/</gm, '&lt;')
+                                                 .replace(/>/gm, '&gt;');
+                            response.status(500).send('<pre style="color:#d92626">' + message + '</pre>');
                         } else {
                             response.send(html);
                             console.log(new Date().toLocaleString(), 'RenderTpl', absTplFilePath);

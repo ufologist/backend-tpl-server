@@ -1,5 +1,11 @@
 # CHANGELOG
 
+* v0.7.1 2017-9-7
+
+  * [[fix](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#type)] 当模版页面解析出错时没有报错, 而是输出了一个空 JSON
+
+    由于在 `render` 方法中做错误处理时没有将有用的错误信息输出到页面上造成的
+
 * v0.7.0 2017-9-6
 
   当 HTTP Mock 文件修改后, 自动刷新 HTTP Mock 路由, 不再需要 `nodemon` 了
