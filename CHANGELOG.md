@@ -1,5 +1,9 @@
 # CHANGELOG
 
+* v0.7.2 2017-9-8
+
+  * [refactor] 提取模块, 重构了代码
+
 * v0.7.1 2017-9-7
 
   * [[fix](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#type)] 当模版页面解析出错时没有报错, 而是输出了一个空 JSON

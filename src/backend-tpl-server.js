@@ -28,59 +28,9 @@ var Mock = require('mockjs');
 
 var pkg = require('../package.json');
 
-var getViewMockData = require('./get-view-mock-data.js');
-var mockHttpApi = require('./mock-http-api.js');
-
-/**
- * 获取所有的路由信息
- * 
- * http://stackoverflow.com/questions/14934452/how-to-get-all-registered-routes-in-express
- * https://github.com/brennancheung/express-remove-route
- * 
- * XXX 对于 app.use('/birds', router) 这样路由注册方式还解析不了
- * 
- * @param {object} app express app
- * @return {array} 路由信息数组
- */
-function getRoutes(app) {
-    var routes = [];
-
-    var layerRoutes = findLayerRoutes(app._router.stack);
-    layerRoutes.forEach(function(route) {
-        for (var method in route.methods) {
-            if (route.methods.hasOwnProperty(method)) {
-                routes.push({
-                    method: method,
-                    path: route.path
-                });
-            }
-        }
-    });
-
-    routes.sort(function(a, b) {
-        if (a.path > b.path) {
-            return 1;
-        } else if (a.path < b.path) {
-            return -1;
-        } else {
-            return 0;
-        }
-    });
-
-    return routes;
-}
-
-function findLayerRoutes(stack) {
-    var layerRoutes = [];
-    stack.forEach(function(layer) {
-        if (layer.route) {
-            layerRoutes.push(layer.route);
-        } else if (layer.name == 'router') {
-            layerRoutes = layerRoutes.concat(findLayerRoutes(layer.handle.stack));
-        }
-    });
-    return layerRoutes;
-}
+var getRoutes = require('./get-routes.js');
+var renderTpl = require('./render-tpl.js');
+var mockHttpApi = require('mock-http-api');
 
 // polyfill javascript 中没有的方法, 不然会造成模版中使用的方法不生效
 // 例如: 在模版中使用 Java 字符串比对 #if($a.equals("abc")) hello #end
@@ -251,48 +201,7 @@ BackendTplServer.prototype.registerGetRoutesApi = function() {
  * 与 url 方法的逻辑类似, 但是不需要我们通过写代码来定义路由指定模版页面
  */
 BackendTplServer.prototype.registerRenderTplRoute = function() {
-    this.app.get('/_views/*', function(request, response) {
-        // http://www.expressjs.com.cn/4x/api.html#req.params
-        // This rule is applied to unnamed wild card matches with string routes such as /file/*
-        var tplFilePath = request.params[0];
-        var absTplFilePath = path.resolve(request.app.get('views'), tplFilePath);
-
-        // 原来由于 weinre 中定义了 Error.prepareStackTrace 方法,
-        // 只要 render 方法有错误(模版文件不存在或者有其他错误时),
-        // 如果不使用 callback 回调来处理这个错误, 就会造成进程挂掉.
-        //
-        // 现在 delete 了 Error.prepareStackTrace 方法后,
-        // render 方法出错不会造成进程挂掉, 会在页面中打印出错误调用链, 但提示不是很友好,
-        // 为了提示更加友好, 先判断文件是否存在, 再去渲染, 根据文件状态给与不同的错误提示
-        fs.stat(absTplFilePath, function(error, stats) {
-            if (!error) {
-                if (stats.isFile()) {
-                    response.render(tplFilePath, getViewMockData(tplFilePath), function(e, html) {
-                        if(e) {
-                            console.error('渲染模版页面出错', e);
-                            var message = e.stack.replace(/</gm, '&lt;')
-                                                 .replace(/>/gm, '&gt;');
-                            response.status(500).send('<pre style="color:#d92626">' + message + '</pre>');
-                        } else {
-                            response.send(html);
-                            console.log(new Date().toLocaleString(), 'RenderTpl', absTplFilePath);
-                            console.log('---------------------------------------------------------');
-                        }
-                    });
-                } else if (stats.isDirectory()) {
-                    response.status(400).send('这是一个文件夹: ' + absTplFilePath);
-                } else {
-                    response.status(400).send(stats);
-                }
-            } else {
-                if (error.code == 'ENOENT') {
-                    response.status(404).send('没有找到这个文件: ' + absTplFilePath);
-                } else {
-                    response.status(500).send(error);
-                }
-            }
-        });
-    });
+    this.app.get('/_views/*', renderTpl);
 };
 
 /**
