@@ -28,6 +28,16 @@ function readJson(filePath) {
     return json;
 }
 
+// 获取一个模版页面中所有的数据结构
+// var Data = require('velocity').Data;
+// var data = new Data({
+//     root: '../src/main/webapp/',
+//     template: '../src/main/webapp/views/path/to/vm.html',
+//     output: './vm-data.js'
+// });
+// var reselt = data.extract();
+// console.log(reselt.raw);
+
 module.exports = {
     readJson: readJson
 };
