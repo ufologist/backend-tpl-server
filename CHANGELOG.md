@@ -1,5 +1,9 @@
 # CHANGELOG
 
+* v0.7.3 2017-10-12
+
+  升级 [mock-http-api](https://github.com/ufologist/mock-http-api) 模块到 `1.1.2` 版本, 现在支持 `proxy` 配置代理接口了
+
 * v0.7.2 2017-9-8
 
   * [refactor] 提取模块, 重构了代码
