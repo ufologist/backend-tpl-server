@@ -10,7 +10,7 @@
     "api": {
         "GET /index": {
             "proxy": {
-                "target": "http://localhost:8003/index.html",
+                "target": "http://localhost:8100/_views/example.html",
                 "ignorePath": true
             }
         }
