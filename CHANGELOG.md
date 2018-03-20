@@ -1,8 +1,16 @@
 # CHANGELOG
 
+* v0.7.4 2018-3-20
+
+  * [fix] `_global.js` 全局数据需要重启服务器才能生效, 需要清除 `require()` 的缓存
+
 * v0.7.3 2017-10-12
 
-  升级 [mock-http-api](https://github.com/ufologist/mock-http-api) 模块到 `1.1.2` 版本, 现在支持 `proxy` 配置代理接口了
+  * 升级 [mock-http-api](https://github.com/ufologist/mock-http-api) 模块到 `1.1.2` 版本, 现在支持 `proxy` 配置代理接口了
+
+  * 发现有一个类似功能的模块 [moky](https://github.com/int64ago/moky) 支持 viewsMock 和 asyncMock 真是君子所见略同啊
+
+    > A proxy server with mock
 
 * v0.7.2 2017-9-8
 

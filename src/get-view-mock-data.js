@@ -96,6 +96,7 @@ function getMockDataFromJson(absMockJsonFilePath) {
 function getMockDataFromJs(absMockJsFilePath) {
     var mockData = {};
     try {
+        delete require.cache[absMockJsFilePath];
         mockData = require(absMockJsFilePath);
         console.log(new Date().toLocaleString(), 'getMockDataFromJs', absMockJsFilePath);
     } catch (error) {
