@@ -1,6 +1,6 @@
 {
   "name": "backend-tpl-server",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "后端模版页面服务器",
   "main": "src/backend-tpl-server.js",
   "scripts": {
