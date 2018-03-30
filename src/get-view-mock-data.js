@@ -1,12 +1,12 @@
 var path = require('path');
 var fs = require('fs');
 
-// 如果使用 json5 能够让 JSON 文件更加容错, 写起来更容易
-// https://github.com/json5/json5
+var stripJsonComments = require('strip-json-comments');
+// 使用 json5 能够让 JSON 文件更加容错, 写起来更容易
 // JSON isn’t the friendliest to write.
 // Keys need to be quoted, objects and arrays can’t have trailing commas,
 // and comments aren’t allowed
-var stripJsonComments = require('strip-json-comments');
+var JSON5 = require('json5');
 var Mock = require('mockjs');
 var merge = require('merge');
 
@@ -76,8 +76,13 @@ function getMockDataFromJson(absMockJsonFilePath) {
         mockData = JSON.parse(stripJsonComments(mockFileContent));
         console.log(new Date().toLocaleString(), 'getMockDataFromJson', absMockJsonFilePath);
     } catch (error) {
-        console.error('模版页面的 Mock 数据配置有问题', absMockJsonFilePath);
-        console.error(error);
+        try {
+            mockData = JSON5.parse(mockFileContent);
+            console.log(new Date().toLocaleString(), 'getMockDataFromJson', absMockJsonFilePath);
+        } catch (error) {
+            console.error('模版页面的 Mock 数据配置有问题', absMockJsonFilePath);
+            console.error(error);
+        }
     }
     return mockData;
 }

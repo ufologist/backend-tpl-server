@@ -25,6 +25,7 @@
   "dependencies": {
     "express": "^4.15.2",
     "express-velocity": "^1.0.0",
+    "json5": "^1.0.1",
     "merge": "^1.2.0",
     "mock-http-api": "^1.1.2",
     "mockjs": "^1.0.1-beta3",
