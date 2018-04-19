@@ -2,6 +2,8 @@ var http = require('http');
 var path = require('path');
 var fs = require('fs');
 
+var merge = require('merge');
+
 var express = require('express');
 var vm = require('express-velocity');
 
@@ -58,8 +60,8 @@ if (!String.prototype.equals) {
  *         static: webroot + '/resources', // 静态资源所在的目录
  *         views: webroot + '/views'       // 页面模版所在的目录
  *     },
- *     port: 8000, // 服务启动所在的端口
- *     tplFileExt: 'html' // 模版页面文件名的后缀
+ *     port: 8000,                         // 服务启动所在的端口
+ *     tplFileExt: 'html'                  // 模版页面文件名的后缀
  * }
  */
 function BackendTplServer(webroot, options) {
@@ -67,13 +69,13 @@ function BackendTplServer(webroot, options) {
     var server = http.createServer(app);
 
     this.webroot = webroot;
-    this.options = Object.assign({
+    this.options = merge.recursive({
         web: {
             static: webroot + '/resources',
             views: webroot + '/views'
         },
         port: 8000,
-        tplFileExt: 'html' // 模版页面文件名的后缀
+        tplFileExt: 'html'
     }, options);
 
     this.app = app;

@@ -54,7 +54,7 @@ function getViewMockData(tplFilePath) {
     if (hasGlobalMockJsFile) {
         var globalData = getMockDataFromJs(absGlobalMockJsFilePath);
         merge(mockData, globalData);
-        console.log(new Date().toLocaleString(), 'globalViewMockData', globalData);
+        console.log(new Date().toLocaleString(), 'globalViewMockData', JSON.stringify(globalData, null, 4));
     }
 
     console.log(new Date().toLocaleString(), 'getViewMockData', JSON.stringify(mockData, null, 4));

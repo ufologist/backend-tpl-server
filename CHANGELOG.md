@@ -1,5 +1,9 @@
 # CHANGELOG
 
+* v0.7.6 2018-4-19
+
+  * [fix] 使用 `merge.recursive` 来合并 `BackendTplServer` 的 `options` 配置项
+
 * v0.7.5 2018-3-30
 
   * [fix] 使用 `JSON5` 来解析模版页面的 Mock 数据配置文件, 增强配置的容错性
